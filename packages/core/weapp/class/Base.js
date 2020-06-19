@@ -1,4 +1,4 @@
-import { isArr, isStr, isObj, toArray, handleError } from './../util/index';
+import { isArr, isStr, isObj, handleError } from '../util/index';
 import { set, del } from '../observer/index';
 
 export default class Base {
@@ -57,26 +57,18 @@ export default class Base {
 
     if (fn) {
       let fns = this._events[event];
-      let i = fns.length;
-      while (i--) {
-        let tmp = fns[i];
-        if (tmp === fn || tmp.fn === fn) {
-          fns.splice(i, 1);
-          break;
-        }
-      }
+      this._events[event] = fns.filter(f => f !== fn);
     }
     return this;
   }
 
-  $emit(event) {
+  $emit(event, ...args) {
     let vm = this;
     let lowerCaseEvent = event.toLowerCase();
     let fns = this._events[event] || [];
     if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
       // TODO: handler warn
     }
-    let args = toArray(arguments, 1);
     fns.forEach(fn => {
       try {
         fn.apply(this, args);
